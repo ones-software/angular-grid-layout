@@ -10,22 +10,22 @@ const activeEventListenerOptions = ktdNormalizePassiveListenerOptions({passive: 
 
 let isMobile: boolean | null = null;
 
-export function ktdIsMobileOrTablet(): boolean {
+// export function ktdIsMobileOrTablet(): boolean {
 
-    if (isMobile != null) {
-        return isMobile;
-    }
+//     if (isMobile != null) {
+//         return isMobile;
+//     }
 
-    // Generic match pattern to identify mobile or tablet devices
-    const isMobileDevice = /Android|webOS|BlackBerry|Windows Phone|iPad|iPhone|iPod/i.test(navigator.userAgent);
+//     // Generic match pattern to identify mobile or tablet devices
+//     const isMobileDevice = /Android|webOS|BlackBerry|Windows Phone|iPad|iPhone|iPod/i.test(navigator.userAgent);
 
-    // Since IOS 13 is not safe to just check for the generic solution. See: https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
-    const isIOSMobileDevice = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+//     // Since IOS 13 is not safe to just check for the generic solution. See: https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
+//     const isIOSMobileDevice = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-    isMobile = isMobileDevice || isIOSMobileDevice;
+//     isMobile = isMobileDevice || isIOSMobileDevice;
 
-    return isMobile;
-}
+//     return isMobile;
+// }
 
 export function ktdIsMouseEvent(event: any): event is MouseEvent {
     return (event as MouseEvent).clientX != null;
@@ -56,8 +56,7 @@ export function ktdPointerClient(event: MouseEvent | TouchEvent): {clientX: numb
  * @param touchNumber number of the touch to track the event, default to the first one.
  */
 export function ktdMouseOrTouchDown(element, touchNumber = 1): Observable<MouseEvent | TouchEvent> {
-    return iif(
-        () => ktdIsMobileOrTablet(),
+    return merge(
         fromEvent<TouchEvent>(element, 'touchstart', passiveEventListenerOptions as AddEventListenerOptions).pipe(
             filter((touchEvent) => touchEvent.touches.length === touchNumber)
         ),
@@ -80,8 +79,7 @@ export function ktdMouseOrTouchDown(element, touchNumber = 1): Observable<MouseE
  * @param touchNumber number of the touch to track the event, default to the first one.
  */
 export function ktdMouseOrTouchMove(element, touchNumber = 1): Observable<MouseEvent | TouchEvent> {
-    return iif(
-        () => ktdIsMobileOrTablet(),
+    return merge(
         fromEvent<TouchEvent>(element, 'touchmove', activeEventListenerOptions as AddEventListenerOptions).pipe(
             filter((touchEvent) => touchEvent.touches.length === touchNumber),
         ),
@@ -106,8 +104,7 @@ export function ktdTouchEnd(element, touchNumber = 1): Observable<TouchEvent> {
  * @param touchNumber number of the touch to track the event, default to the first one.
  */
 export function ktdMouseOrTouchEnd(element, touchNumber = 1): Observable<MouseEvent | TouchEvent> {
-    return iif(
-        () => ktdIsMobileOrTablet(),
+    return merge(
         ktdTouchEnd(element, touchNumber),
         fromEvent<MouseEvent>(element, 'mouseup'),
     );
