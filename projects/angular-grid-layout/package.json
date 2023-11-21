@@ -1,13 +1,17 @@
 {
-    "name": "@katoid/angular-grid-layout",
+    "name": "@ones-software/angular-grid-layout",
     "description": "Grid Layout with draggable and resizable items for Angular",
-    "homepage": "https://github.com/katoid/angular-grid-layout",
+    "homepage": "https://github.com/ones-software/angular-grid-layout",
     "bugs": {
-        "url": "https://github.com/katoid/angular-grid-layout/issues"
+        "url": "https://github.com/ones-software/angular-grid-layout/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/katoid/angular-grid-layout.git"
+        "url": "git+https://github.com/ones-software/angular-grid-layout.git"
+    },
+    
+    "publishConfig": {
+        "registry": "https://pkgs.dev.azure.com/onessoftware/Bookings.ONE/_packaging/npm-packages/npm/registry/"
     },
     "license": "MIT",
     "version": "2.2.0",
