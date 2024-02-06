@@ -29,6 +29,7 @@ export interface KtdGridBackgroundCfg {
 export interface KtdGridCfg {
     cols: number;
     rowHeight: number | 'fit'; // row height in pixels
+    rows: number | 'auto';
     height?: number | null;
     layout: KtdGridLayoutItem[];
     preventCollision: boolean;
