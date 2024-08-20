@@ -10,13 +10,13 @@
     $foreground: map.get($theme, foreground);
 
 
-    --ktd-color-primary: #{mat.get-color-from-palette($primary, default)};
-    --ktd-color-primary-rgb: #{red(mat.get-color-from-palette($primary, default)), green(mat.get-color-from-palette($primary, default)), blue(mat.get-color-from-palette($primary, default))};
-    --ktd-color-primary-contrast:  #{mat.get-color-from-palette($primary, default-contrast)};
+    --ktd-color-primary: #{mat.m2-get-color-from-palette($primary, default)};
+    --ktd-color-primary-rgb: #{red(mat.m2-get-color-from-palette($primary, default)), green(mat.m2-get-color-from-palette($primary, default)), blue(mat.m2-get-color-from-palette($primary, default))};
+    --ktd-color-primary-contrast:  #{mat.m2-get-color-from-palette($primary, default-contrast)};
 
-    --ktd-color-accent: #{mat.get-color-from-palette($accent, default)};
-    --ktd-color-accent-rgb: #{red(mat.get-color-from-palette($accent, default)), green(mat.get-color-from-palette($accent, default)), blue(mat.get-color-from-palette($accent, default))};
-    --ktd-color-accent-contrast: #{mat.get-color-from-palette($accent, default-contrast)};
+    --ktd-color-accent: #{mat.m2-get-color-from-palette($accent, default)};
+    --ktd-color-accent-rgb: #{red(mat.m2-get-color-from-palette($accent, default)), green(mat.m2-get-color-from-palette($accent, default)), blue(mat.m2-get-color-from-palette($accent, default))};
+    --ktd-color-accent-contrast: #{mat.m2-get-color-from-palette($accent, default-contrast)};
 
     // Background & foreground (as background contrast)
     --ktd-background-color: #121212;
