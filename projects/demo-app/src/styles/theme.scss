@@ -1,10 +1,10 @@
-@use '@angular/material' as mat;
-@use 'variables' as variables;
-@use 'sass:map';
+@use "@angular/material" as mat;
+@use "variables" as variables;
+@use "sass:map";
 
 $app-primary: mat.m2-define-palette(mat.$m2-orange-palette, 500);
-$app-accent:  mat.m2-define-palette(mat.$m2-orange-palette, 300);
-$app-warn:    mat.m2-define-palette(mat.$m2-red-palette, 400);
+$app-accent: mat.m2-define-palette(mat.$m2-orange-palette, 300);
+$app-warn: mat.m2-define-palette(mat.$m2-red-palette, 400);
 
 $dark-primary-text: rgba(black, 0.87);
 $dark-secondary-text: rgba(black, 0.54);
@@ -17,34 +17,33 @@ $light-disabled-text: rgba(white, 0.5);
 $light-dividers: rgba(white, 0.12);
 $light-focused: rgba(white, 0.12);
 
-
 // Foreground palette for dark themes.
 $dark-theme-foreground-palette: (
-    base:              white,
-    divider:           $light-dividers,
-    dividers:          $light-dividers,
-    disabled:          $light-disabled-text,
-    disabled-button:   rgba(white, 0.3),
-    disabled-text:     $light-disabled-text,
-    elevation:         black,
-    hint-text:         $light-disabled-text,
-    secondary-text:    $light-secondary-text,
-    icon:              white,
-    icons:             white,
-    text:              rgba(white, 0.87),
-    slider-min:        white,
-    slider-off:        rgba(white, 0.3),
+    base: white,
+    divider: $light-dividers,
+    dividers: $light-dividers,
+    disabled: $light-disabled-text,
+    disabled-button: rgba(white, 0.3),
+    disabled-text: $light-disabled-text,
+    elevation: black,
+    hint-text: $light-disabled-text,
+    secondary-text: $light-secondary-text,
+    icon: white,
+    icons: white,
+    text: rgba(white, 0.87),
+    slider-min: white,
+    slider-off: rgba(white, 0.3),
     slider-off-active: rgba(white, 0.3),
 );
 
 // Background palette for dark themes.
 $dark-theme-background-palette: (
     status-bar: black,
-    app-bar:    map.get(mat.$m2-grey-palette, 900),
+    app-bar: map.get(mat.$m2-grey-palette, 900),
     background: #2a2a2a,
-    hover:      rgba(white, 0.04),
-    card:       map.get(mat.$m2-grey-palette, 800),
-    dialog:     map.get(mat.$m2-grey-palette, 800),
+    hover: rgba(white, 0.04),
+    card: map.get(mat.$m2-grey-palette, 800),
+    dialog: map.get(mat.$m2-grey-palette, 800),
     disabled-button: rgba(white, 0.12),
     raised-button: map.get(mat.$m2-grey-palette, 800),
     focused-button: $light-focused,
@@ -65,7 +64,6 @@ $app-theme: (
     background: $dark-theme-background-palette,
 );
 
-
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 // Important: include this mixin only once.
@@ -77,12 +75,12 @@ $app-theme: (
 //  If you don't need the default component typographies but still want the hierarchy styles,
 //  you can delete this line and instead use:
 //    `@include mat.legacy-typography-hierarchy(mat.define-legacy-typography-config());`
-@include mat.all-legacy-component-typographies();
-@include mat.legacy-core();
+@include mat.all-component-typographies();
+@include mat.core();
 
 // Specifies the theming for angular material components
-@include mat.all-legacy-component-themes($app-theme);
+@include mat.all-component-themes($app-theme);
 
 body {
-    @include variables.cssVariables($app-theme)
+    @include variables.cssVariables($app-theme);
 }

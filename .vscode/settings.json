@@ -1,0 +1,33 @@
+{
+  "editor.formatOnSave": true,
+  "html.format.wrapAttributes": "force-aligned",
+  "html.suggest.html5": true,
+  "editor.wrappingIndent": "indent",
+  "editor.detectIndentation": false,
+  "html.format.endWithNewline": true,
+  "prettier.singleQuote": true,
+  "prettier.tabWidth": 2,
+  "prettier.arrowParens": "always",
+  "prettier.useTabs": false,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/coverge": true
+  },
+  "editor.tabSize": 2,
+  "cSpell.enabled": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "node_modules": true
+  },
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active"
+}
