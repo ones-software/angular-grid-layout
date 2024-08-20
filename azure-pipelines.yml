@@ -1,0 +1,12 @@
+trigger: none
+
+pool: 'Build Servers'
+
+steps:
+  - task: Docker@2
+    displayName: build
+    inputs:
+      command: build
+      Dockerfile: Dockerfile
+      arguments: --build-arg USERNAME=$(username) --build-arg EMAIL=$(email) --build-arg ACCESS_TOKEN=$(access_token)
+      buildContext: '$(System.DefaultWorkingDirectory)'
