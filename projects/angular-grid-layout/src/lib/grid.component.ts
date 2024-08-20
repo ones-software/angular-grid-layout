@@ -1,76 +1,73 @@
 import {
-    AfterContentChecked,
-    AfterContentInit,
-    ChangeDetectionStrategy,
-    Component,
-    ContentChildren,
-    ElementRef,
-    EmbeddedViewRef,
-    EventEmitter,
-    HostBinding,
-    Input,
-    NgZone,
-    OnChanges,
-    OnDestroy,
-    Output,
-    QueryList,
-    Renderer2,
-    SimpleChanges,
-    ViewContainerRef,
-    ViewEncapsulation,
+  AfterContentChecked,
+  AfterContentInit,
+  ChangeDetectionStrategy,
+  Component,
+  ContentChildren,
+  ElementRef,
+  EmbeddedViewRef,
+  Input,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  output,
+  QueryList,
+  Renderer2,
+  SimpleChanges,
+  ViewContainerRef,
+  ViewEncapsulation
 } from '@angular/core';
-import { coerceNumberProperty, NumberInput } from './coercion/number-property';
-import { KtdGridItemComponent } from './grid-item/grid-item.component';
 import {
-    combineLatest,
-    empty,
-    merge,
-    NEVER,
-    Observable,
-    Observer,
-    of,
-    Subscription,
+  combineLatest,
+  merge,
+  NEVER,
+  Observable,
+  Observer,
+  of,
+  Subscription
 } from 'rxjs';
 import {
-    exhaustMap,
-    map,
-    startWith,
-    switchMap,
-    takeUntil,
+  exhaustMap,
+  map,
+  startWith,
+  switchMap,
+  takeUntil,
 } from 'rxjs/operators';
-import {
-    ktdGetGridItemRowHeight,
-    ktdGridItemDragging,
-    ktdGridItemLayoutItemAreEqual,
-    ktdGridItemResizing,
-} from './utils/grid.utils';
-import { compact } from './utils/react-grid-layout.utils';
-import {
-    GRID_ITEM_GET_RENDER_DATA_TOKEN,
-    KtdGridBackgroundCfg,
-    KtdGridCfg,
-    KtdGridCompactType,
-    KtdGridItemRenderData,
-    KtdGridLayout,
-    KtdGridLayoutItem,
-} from './grid.definitions';
-import {
-    ktdMouseOrTouchEnd,
-    ktdPointerClientX,
-    ktdPointerClientY,
-} from './utils/pointer.utils';
 import { KtdDictionary } from '../types';
+import {
+  BooleanInput,
+  coerceBooleanProperty,
+} from './coercion/boolean-property';
+import { coerceNumberProperty, NumberInput } from './coercion/number-property';
+import { KtdGridItemPlaceholder } from './directives/placeholder';
+import { KtdGridItemComponent } from './grid-item/grid-item.component';
+import {
+  GRID_ITEM_GET_RENDER_DATA_TOKEN,
+  KtdGridBackgroundCfg,
+  KtdGridCfg,
+  KtdGridCompactType,
+  KtdGridItemRenderData,
+  KtdGridLayout,
+  KtdGridLayoutItem,
+} from './grid.definitions';
 import { KtdGridService } from './grid.service';
 import { getMutableClientRect, KtdClientRect } from './utils/client-rect';
 import {
-    ktdGetScrollTotalRelativeDifference$,
-    ktdScrollIfNearElementClientRect$,
-} from './utils/scroll';
+  ktdGetGridItemRowHeight,
+  ktdGridItemDragging,
+  ktdGridItemLayoutItemAreEqual,
+  ktdGridItemResizing,
+} from './utils/grid.utils';
 import {
-    BooleanInput,
-    coerceBooleanProperty,
-} from './coercion/boolean-property';
-import { KtdGridItemPlaceholder } from './directives/placeholder';
+  ktdMouseOrTouchEnd,
+  ktdPointerClientX,
+  ktdPointerClientY,
+} from './utils/pointer.utils';
+import { compact } from './utils/react-grid-layout.utils';
+import {
+  ktdGetScrollTotalRelativeDifference$,
+  ktdScrollIfNearElementClientRect$,
+} from './utils/scroll';
 import { getTransformTransitionDurationInMs } from './utils/transition-duration';
 
 interface KtdDragResizeEvent {
@@ -213,28 +210,28 @@ export class KtdGridComponent
     _gridItems: QueryList<KtdGridItemComponent>;
 
     /** Emits when layout change */
-    @Output() layoutUpdated: EventEmitter<KtdGridLayout> =
-        new EventEmitter<KtdGridLayout>();
+     layoutUpdated =
+        output<KtdGridLayout>();
 
     /** Emits when drag starts */
-    @Output() dragStarted: EventEmitter<KtdDragStart> =
-        new EventEmitter<KtdDragStart>();
+     dragStarted =
+        output<KtdDragStart>();
 
     /** Emits when resize starts */
-    @Output() resizeStarted: EventEmitter<KtdResizeStart> =
-        new EventEmitter<KtdResizeStart>();
+     resizeStarted =
+        output<KtdResizeStart>();
 
     /** Emits when drag ends */
-    @Output() dragEnded: EventEmitter<KtdDragEnd> =
-        new EventEmitter<KtdDragEnd>();
+     dragEnded =
+        output<KtdDragEnd>();
 
     /** Emits when resize ends */
-    @Output() resizeEnded: EventEmitter<KtdResizeEnd> =
-        new EventEmitter<KtdResizeEnd>();
+     resizeEnded =
+        output<KtdResizeEnd>();
 
     /** Emits when a grid item is being resized and its bounds have changed */
-    @Output() gridItemResize: EventEmitter<KtdGridItemResizeEvent> =
-        new EventEmitter<KtdGridItemResizeEvent>();
+     gridItemResize =
+        output<KtdGridItemResizeEvent>();
 
     /**
      * Parent element that contains the scroll. If an string is provided it would search that element by id on the dom.
