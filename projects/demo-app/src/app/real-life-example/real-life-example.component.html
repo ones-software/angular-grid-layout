@@ -1,12 +1,14 @@
 <div class="grid-container">
-    <ktd-grid [cols]="cols"
-              [rowHeight]="rowHeight"
-              [layout]="layout"
-              [scrollableParent]="document"
-              [compactType]="compactType"
-              (layoutUpdated)="onLayoutUpdated($event)"
-              (gridItemResize)="onGridItemResize($event)">
-        <ktd-grid-item id="0" minW="4">
+    <ktd-grid
+        [cols]="cols"
+        [rowHeight]="rowHeight"
+        [layout]="layout"
+        [scrollableParent]="document"
+        [compactType]="compactType"
+        (layoutUpdated)="onLayoutUpdated($event)"
+        (gridItemResize)="onGridItemResize($event)"
+    >
+        <ktd-grid-item id="0" [minW]="4">
             <ngx-charts-bar-vertical-stacked
                 [view]="layoutSizes['0']"
                 [scheme]="colorScheme2"
@@ -20,7 +22,8 @@
                 [xAxisLabel]="xAxisLabel"
                 [yAxisLabel]="yAxisLabel"
                 [animations]="animations"
-                (select)="onSelect('0', $event)">
+                (select)="onSelect('0', $event)"
+            >
             </ngx-charts-bar-vertical-stacked>
             <ng-template ktdGridItemPlaceholder>
                 <div class="custom-placeholder-container">
@@ -37,7 +40,8 @@
                         [xAxisLabel]="xAxisLabel"
                         [yAxisLabel]="yAxisLabel"
                         [animations]="false"
-                        (select)="onSelect('0', $event)">
+                        (select)="onSelect('0', $event)"
+                    >
                     </ngx-charts-bar-vertical-stacked>
                 </div>
             </ng-template>
@@ -59,7 +63,8 @@
                 [yAxisLabel]="xAxisLabel"
                 (select)="onSelect('1', $event)"
                 (activate)="onActivate('1', $event)"
-                (deactivate)="onDeactivate('1', $event)">
+                (deactivate)="onDeactivate('1', $event)"
+            >
             </ngx-charts-bar-horizontal-2d>
             <ng-template ktdGridItemPlaceholder>
                 <div class="custom-placeholder-container">
@@ -77,7 +82,8 @@
                         [showXAxisLabel]="showXAxisLabel"
                         [showYAxisLabel]="showYAxisLabel"
                         [xAxisLabel]="yAxisLabel"
-                        [yAxisLabel]="xAxisLabel">
+                        [yAxisLabel]="xAxisLabel"
+                    >
                     </ngx-charts-bar-horizontal-2d>
                 </div>
             </ng-template>
@@ -90,7 +96,8 @@
                 [gradient]="false"
                 [animations]="true"
                 [labelFormatting]="labelFormatting"
-                (select)="onSelect('2', $event)">
+                (select)="onSelect('2', $event)"
+            >
             </ngx-charts-tree-map>
             <ng-template ktdGridItemPlaceholder>
                 <div class="custom-placeholder-container">
@@ -101,14 +108,15 @@
                         [results]="countriesPopulation"
                         [gradient]="false"
                         [animations]="false"
-                        [labelFormatting]="labelFormatting">
+                        [labelFormatting]="labelFormatting"
+                    >
                     </ngx-charts-tree-map>
                 </div>
             </ng-template>
         </ktd-grid-item>
         <ktd-grid-item id="3">
             <div class="ktd-grid-img-container">
-                <img src="assets/icons/katoid-icon-192x192.png">
+                <img src="assets/icons/katoid-icon-192x192.png" />
             </div>
         </ktd-grid-item>
         <ktd-grid-item class="ktd-grid-item-table" id="4">
@@ -130,7 +138,8 @@
                 [doughnut]="false"
                 (select)="onSelect('5', $event)"
                 (activate)="onActivate('5', $event)"
-                (deactivate)="onDeactivate('5', $event)">
+                (deactivate)="onDeactivate('5', $event)"
+            >
             </ngx-charts-pie-chart>
             <ng-template ktdGridItemPlaceholder>
                 <div class="custom-placeholder-container">
@@ -142,7 +151,8 @@
                         [legend]="false"
                         [labels]="showLabels"
                         [animations]="false"
-                        [doughnut]="false">
+                        [doughnut]="false"
+                    >
                     </ngx-charts-pie-chart>
                 </div>
             </ng-template>
@@ -150,4 +160,3 @@
     </ktd-grid>
 </div>
 <ktd-footer></ktd-footer>
-

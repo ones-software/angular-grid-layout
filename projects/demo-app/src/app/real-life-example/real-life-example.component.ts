@@ -1,34 +1,58 @@
-import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { KtdGridComponent, KtdGridItemResizeEvent, KtdGridLayout, ktdTrackById } from '@katoid/angular-grid-layout';
+import { DOCUMENT } from '@angular/common';
+import {
+    ChangeDetectorRef,
+    Component,
+    Inject,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
+import {
+    KtdGridComponent,
+    KtdGridItemResizeEvent,
+    KtdGridLayout,
+    ktdTrackById,
+} from '@katoid/angular-grid-layout';
+import { Color, LegendPosition, ScaleType } from '@swimlane/ngx-charts';
 import { fromEvent, merge, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { countriesPopulation, countriesPopulationByYear } from './data/countries-population.data';
-import { Color, LegendPosition, ScaleType } from '@swimlane/ngx-charts';
-import { DOCUMENT } from '@angular/common';
+import {
+    countriesPopulation,
+    countriesPopulationByYear,
+} from './data/countries-population.data';
 
 @Component({
     selector: 'ktd-real-life-example',
     templateUrl: './real-life-example.component.html',
-    styleUrls: ['./real-life-example.component.scss']
+    styleUrls: ['./real-life-example.component.scss'],
 })
 export class KtdRealLifeExampleComponent implements OnInit, OnDestroy {
-    @ViewChild(KtdGridComponent, {static: true}) grid: KtdGridComponent;
+    @ViewChild(KtdGridComponent, { static: true }) grid: KtdGridComponent;
 
     trackById = ktdTrackById;
     cols = 12;
     rowHeight = 50;
     compactType: 'vertical' | 'horizontal' | null = 'vertical';
     layout: KtdGridLayout = [
-        {id: '0', x: 0, y: 5, w: 4, h: 10, minW: 2, minH: 5},
-        {id: '1', x: 4, y: 5, w: 4, h: 10, minW: 2, minH: 5},
-        {id: '2', x: 2, y: 0, w: 6, h: 5, minW: 4, minH: 4, maxW: 8, maxH: 14},
-        {id: '5', x: 8, y: 0, w: 4, h: 5, minW: 2, minH: 3},
-        {id: '3', x: 0, y: 0, w: 2, h: 5, minH: 3},
-        {id: '4', x: 8, y: 5, w: 4, h: 10, minW: 3, minH: 5, maxH: 12}
+        { id: '0', x: 0, y: 5, w: 4, h: 10, minW: 2, minH: 5 },
+        { id: '1', x: 4, y: 5, w: 4, h: 10, minW: 2, minH: 5 },
+        {
+            id: '2',
+            x: 2,
+            y: 0,
+            w: 6,
+            h: 5,
+            minW: 4,
+            minH: 4,
+            maxW: 8,
+            maxH: 14,
+        },
+        { id: '5', x: 8, y: 0, w: 4, h: 5, minW: 2, minH: 3 },
+        { id: '3', x: 0, y: 0, w: 2, h: 5, minH: 3 },
+        { id: '4', x: 8, y: 5, w: 4, h: 10, minW: 3, minH: 5, maxH: 12 },
     ];
 
     layoutSizes: { [id: string]: [number, number] } = {};
-
 
     countriesPopulation: any[] = countriesPopulation;
     countriesPopulationByYear: any[] = countriesPopulationByYear;
@@ -46,44 +70,61 @@ export class KtdRealLifeExampleComponent implements OnInit, OnDestroy {
     timeline: boolean = true;
 
     colorScheme: Color = {
-        domain: ['#5AA454', '#E44D25', '#CFC0BB', '#7aa3e5', '#a8385d', '#aae3f5'],
+        domain: [
+            '#5AA454',
+            '#E44D25',
+            '#CFC0BB',
+            '#7aa3e5',
+            '#a8385d',
+            '#aae3f5',
+        ],
         group: ScaleType.Ordinal,
         selectable: true,
-        name: 'Customer Usage'
+        name: 'Customer Usage',
     };
 
     colorScheme2: Color = {
-        domain: ['#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f', '#edc949', '#af7aa1'],
+        domain: [
+            '#4e79a7',
+            '#f28e2c',
+            '#e15759',
+            '#76b7b2',
+            '#59a14f',
+            '#edc949',
+            '#af7aa1',
+        ],
         group: ScaleType.Ordinal,
         selectable: true,
-        name: 'vertical stacked'
+        name: 'vertical stacked',
     };
 
     colorSchemeGradientLinear: Color = {
         domain: ['#4e79a7', '#f28e2c', '#e15759'],
         group: ScaleType.Ordinal,
         selectable: true,
-        name: 'color gradient'
+        name: 'color gradient',
     };
 
     legendBelow = LegendPosition.Below;
     schemeType = ScaleType.Linear;
 
-
     private resizeSubscription: Subscription;
 
-    constructor(@Inject(DOCUMENT) public document: Document, private cd: ChangeDetectorRef) { }
+    constructor(
+        @Inject(DOCUMENT) public document: Document,
+        private cd: ChangeDetectorRef,
+    ) {}
 
     ngOnInit() {
         this.resizeSubscription = merge(
             fromEvent(window, 'resize'),
-            fromEvent(window, 'orientationchange')
-        ).pipe(
-            debounceTime(50)
-        ).subscribe(() => {
-            this.grid.resize();
-            this.calculateLayoutSizes();
-        });
+            fromEvent(window, 'orientationchange'),
+        )
+            .pipe(debounceTime(50))
+            .subscribe(() => {
+                this.grid.resize();
+                this.calculateLayoutSizes();
+            });
     }
 
     ngOnDestroy() {
@@ -92,10 +133,7 @@ export class KtdRealLifeExampleComponent implements OnInit, OnDestroy {
 
     getView(gridItemId: string, grid: KtdGridComponent): [number, number] {
         const gridItemRenderData = grid.getItemRenderData(gridItemId);
-        return [
-            gridItemRenderData.width,
-            gridItemRenderData.height
-        ];
+        return [gridItemRenderData.width, gridItemRenderData.height];
     }
 
     onLayoutUpdated(layout: KtdGridLayout) {
@@ -104,7 +142,7 @@ export class KtdRealLifeExampleComponent implements OnInit, OnDestroy {
     }
 
     labelFormatting(c) {
-        return `${(c.label)} Population`;
+        return `${c.label} Population`;
     }
 
     onSelect(id: string, data): void {
@@ -121,7 +159,10 @@ export class KtdRealLifeExampleComponent implements OnInit, OnDestroy {
 
     onGridItemResize(gridItemResizeEvent: KtdGridItemResizeEvent) {
         console.log('onGridItemResize', gridItemResizeEvent);
-        this.layoutSizes[gridItemResizeEvent.gridItemRef.id] = [gridItemResizeEvent.width, gridItemResizeEvent.height];
+        this.layoutSizes[gridItemResizeEvent.gridItemRef.id()] = [
+            gridItemResizeEvent.width,
+            gridItemResizeEvent.height,
+        ];
         this.cd.detectChanges();
     }
 
@@ -131,12 +172,15 @@ export class KtdRealLifeExampleComponent implements OnInit, OnDestroy {
      */
     private calculateLayoutSizes() {
         const gridItemsRenderData = this.grid.getItemsRenderData();
-        this.layoutSizes =
-            Object.keys(gridItemsRenderData)
-                .reduce((acc, cur) => ({
-                    ...acc,
-                    [cur]: [gridItemsRenderData[cur].width, gridItemsRenderData[cur].height]
-                }), {});
+        this.layoutSizes = Object.keys(gridItemsRenderData).reduce(
+            (acc, cur) => ({
+                ...acc,
+                [cur]: [
+                    gridItemsRenderData[cur].width,
+                    gridItemsRenderData[cur].height,
+                ],
+            }),
+            {},
+        );
     }
-
 }

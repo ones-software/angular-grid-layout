@@ -1,12 +1,16 @@
-import { fromEvent, iif, merge, Observable } from 'rxjs';
+import { fromEvent, merge, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ktdNormalizePassiveListenerOptions } from './passive-listeners';
 
 /** Options that can be used to bind a passive event listener. */
-const passiveEventListenerOptions = ktdNormalizePassiveListenerOptions({passive: true});
+const passiveEventListenerOptions = ktdNormalizePassiveListenerOptions({
+    passive: true,
+});
 
 /** Options that can be used to bind an active event listener. */
-const activeEventListenerOptions = ktdNormalizePassiveListenerOptions({passive: false});
+const activeEventListenerOptions = ktdNormalizePassiveListenerOptions({
+    passive: false,
+});
 
 let isMobile: boolean | null = null;
 
@@ -32,7 +36,10 @@ export function ktdIsMouseEvent(event: any): event is MouseEvent {
 }
 
 export function ktdIsTouchEvent(event: any): event is TouchEvent {
-    return (event as TouchEvent).touches != null && (event as TouchEvent).touches.length != null;
+    return (
+        (event as TouchEvent).touches != null &&
+        (event as TouchEvent).touches.length != null
+    );
 }
 
 export function ktdPointerClientX(event: MouseEvent | TouchEvent): number {
@@ -43,10 +50,17 @@ export function ktdPointerClientY(event: MouseEvent | TouchEvent): number {
     return ktdIsMouseEvent(event) ? event.clientY : event.touches[0].clientY;
 }
 
-export function ktdPointerClient(event: MouseEvent | TouchEvent): {clientX: number, clientY: number} {
-    return  {
-        clientX: ktdIsMouseEvent(event) ? event.clientX : event.touches[0].clientX,
-        clientY: ktdIsMouseEvent(event) ? event.clientY : event.touches[0].clientY
+export function ktdPointerClient(event: MouseEvent | TouchEvent): {
+    clientX: number;
+    clientY: number;
+} {
+    return {
+        clientX: ktdIsMouseEvent(event)
+            ? event.clientX
+            : event.touches[0].clientX,
+        clientY: ktdIsMouseEvent(event)
+            ? event.clientY
+            : event.touches[0].clientY,
     };
 }
 
@@ -55,12 +69,23 @@ export function ktdPointerClient(event: MouseEvent | TouchEvent): {clientX: numb
  * @param element, html element where to  listen the events.
  * @param touchNumber number of the touch to track the event, default to the first one.
  */
-export function ktdMouseOrTouchDown(element, touchNumber = 1): Observable<MouseEvent | TouchEvent> {
+export function ktdMouseOrTouchDown(
+    element,
+    touchNumber = 1,
+): Observable<MouseEvent | TouchEvent> {
     return merge(
-        fromEvent<TouchEvent>(element, 'touchstart', passiveEventListenerOptions as AddEventListenerOptions).pipe(
-            filter((touchEvent) => touchEvent.touches.length === touchNumber)
+        fromEvent<TouchEvent>(
+            element,
+            'touchstart',
+            passiveEventListenerOptions as AddEventListenerOptions,
+        ).pipe(
+            filter((touchEvent) => touchEvent.touches.length === touchNumber),
         ),
-        fromEvent<MouseEvent>(element, 'mousedown', activeEventListenerOptions as AddEventListenerOptions).pipe(
+        fromEvent<MouseEvent>(
+            element,
+            'mousedown',
+            activeEventListenerOptions as AddEventListenerOptions,
+        ).pipe(
             filter((mouseEvent: MouseEvent) => {
                 /**
                  * 0 : Left mouse button
@@ -68,8 +93,8 @@ export function ktdMouseOrTouchDown(element, touchNumber = 1): Observable<MouseE
                  * 2 : Right mouse button
                  */
                 return mouseEvent.button === 0; // Mouse down to be only fired if is left click
-            })
-        )
+            }),
+        ),
     );
 }
 
@@ -78,23 +103,38 @@ export function ktdMouseOrTouchDown(element, touchNumber = 1): Observable<MouseE
  * @param element, html element where to  listen the events.
  * @param touchNumber number of the touch to track the event, default to the first one.
  */
-export function ktdMouseOrTouchMove(element, touchNumber = 1): Observable<MouseEvent | TouchEvent> {
+export function ktdMouseOrTouchMove(
+    element,
+    touchNumber = 1,
+): Observable<MouseEvent | TouchEvent> {
     return merge(
-        fromEvent<TouchEvent>(element, 'touchmove', activeEventListenerOptions as AddEventListenerOptions).pipe(
+        fromEvent<TouchEvent>(
+            element,
+            'touchmove',
+            activeEventListenerOptions as AddEventListenerOptions,
+        ).pipe(
             filter((touchEvent) => touchEvent.touches.length === touchNumber),
         ),
-        fromEvent<MouseEvent>(element, 'mousemove', activeEventListenerOptions as AddEventListenerOptions)
+        fromEvent<MouseEvent>(
+            element,
+            'mousemove',
+            activeEventListenerOptions as AddEventListenerOptions,
+        ),
     );
 }
 
 export function ktdTouchEnd(element, touchNumber = 1): Observable<TouchEvent> {
     return merge(
         fromEvent<TouchEvent>(element, 'touchend').pipe(
-            filter((touchEvent) => touchEvent.touches.length === touchNumber - 1)
+            filter(
+                (touchEvent) => touchEvent.touches.length === touchNumber - 1,
+            ),
         ),
         fromEvent<TouchEvent>(element, 'touchcancel').pipe(
-            filter((touchEvent) => touchEvent.touches.length === touchNumber - 1)
-        )
+            filter(
+                (touchEvent) => touchEvent.touches.length === touchNumber - 1,
+            ),
+        ),
     );
 }
 
@@ -103,7 +143,10 @@ export function ktdTouchEnd(element, touchNumber = 1): Observable<TouchEvent> {
  * @param element, html element where to  listen the events.
  * @param touchNumber number of the touch to track the event, default to the first one.
  */
-export function ktdMouseOrTouchEnd(element, touchNumber = 1): Observable<MouseEvent | TouchEvent> {
+export function ktdMouseOrTouchEnd(
+    element,
+    touchNumber = 1,
+): Observable<MouseEvent | TouchEvent> {
     return merge(
         ktdTouchEnd(element, touchNumber),
         fromEvent<MouseEvent>(element, 'mouseup'),

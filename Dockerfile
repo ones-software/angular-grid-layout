@@ -11,7 +11,7 @@ COPY package.json .
 COPY package-lock.json .
 RUN npm install
 COPY . .
-RUN npm run build -- --configuration production
+RUN npm run build:grid:prod
 # try to keep previous same in docker files can optomize the run and build speed
 WORKDIR /src/dist/angular-grid-layout
 RUN npm publish 
