@@ -8,7 +8,7 @@ import {
 import { ktdArrayRemoveItem } from '../utils';
 import { DOCUMENT } from '@angular/common';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
+import {  MatCheckboxChange } from '@angular/material/checkbox';
 import { KtdGridBackgroundCfg } from '../../../../angular-grid-layout/src/lib/grid.definitions';
 
 @Component({
