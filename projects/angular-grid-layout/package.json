@@ -9,12 +9,11 @@
         "type": "git",
         "url": "git+https://github.com/ones-software/angular-grid-layout.git"
     },
-    
     "publishConfig": {
         "registry": "https://pkgs.dev.azure.com/onessoftware/Bookings.ONE/_packaging/npm-packages/npm/registry/"
     },
     "license": "MIT",
-    "version": "2.2.2",
+    "version": "2.2.3",
     "keywords": [
         "angular",
         "grid",
@@ -28,6 +27,6 @@
         "@angular/core": ">=18.0.0"
     },
     "dependencies": {
-        "tslib": "^2.3.1"
+        "tslib": "^2.6.1"
     }
 }

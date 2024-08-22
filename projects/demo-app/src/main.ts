@@ -5,8 +5,9 @@ import { KtdAppModule } from './app/app.module';
 import { environment } from './environments/environment';
 
 if (environment.production) {
-  enableProdMode();
+    enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(KtdAppModule)
-  .catch(err => console.error(err));
+platformBrowserDynamic()
+    .bootstrapModule(KtdAppModule, { ngZone: 'noop' })
+    .catch((err) => console.error(err));

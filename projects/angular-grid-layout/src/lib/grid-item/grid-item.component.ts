@@ -7,7 +7,6 @@ import {
     ElementRef,
     Inject,
     input,
-    NgZone,
     OnDestroy,
     OnInit,
     QueryList,
@@ -42,7 +41,6 @@ import {
     KtdGridItemRenderDataTokenType,
 } from '../grid.definitions';
 import { KtdGridService } from '../grid.service';
-import { ktdOutsideZone } from '../utils/operators';
 import {
     ktdMouseOrTouchDown,
     ktdMouseOrTouchEnd,
@@ -111,7 +109,6 @@ export class KtdGridItemComponent
         public elementRef: ElementRef,
         private gridService: KtdGridService,
         private renderer: Renderer2,
-        private ngZone: NgZone,
         @Inject(GRID_ITEM_GET_RENDER_DATA_TOKEN)
         private getItemRenderData: KtdGridItemRenderDataTokenType,
     ) {}
@@ -240,7 +237,6 @@ export class KtdGridItemComponent
                 const startPointer = ktdPointerClient(startEvent);
                 return this.gridService.mouseOrTouchMove$(document).pipe(
                     takeUntil(ktdMouseOrTouchEnd(document, 1)),
-                    ktdOutsideZone(this.ngZone),
                     filter((moveEvent) => {
                         moveEvent.preventDefault();
                         const movePointer = ktdPointerClient(moveEvent);
