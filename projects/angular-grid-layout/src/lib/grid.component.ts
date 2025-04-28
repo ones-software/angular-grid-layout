@@ -713,10 +713,23 @@ export class KtdGridComponent
         const endY = this.screenToGridY(currentY);
 
         // Calculate grid-aligned dimensions
-        const x = Math.min(startX, endX);
-        const y = Math.min(startY, endY);
-        const w = Math.abs(endX - startX) + 1;
-        const h = Math.abs(endY - startY) + 1;
+        let x = Math.min(startX, endX);
+        let y = Math.min(startY, endY);
+        let w = Math.abs(endX - startX) + 1;
+        let h = Math.abs(endY - startY) + 1;
+
+        // Constrain to grid boundaries
+        const maxCols = this.cols();
+        const maxRows =
+            this.rows() === 'auto'
+                ? Math.max(...this.layout().map((item) => item.y + item.h))
+                : Number(this.rows());
+
+        // Ensure selection doesn't go beyond grid boundaries
+        x = Math.max(0, Math.min(x, maxCols - 1));
+        y = Math.max(0, Math.min(y, maxRows - 1));
+        w = Math.min(w, maxCols - x);
+        h = Math.min(h, maxRows - y);
 
         // Update selection state
         this.selectionState = { x, y, w, h };
