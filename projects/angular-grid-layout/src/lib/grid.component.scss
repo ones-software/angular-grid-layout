@@ -73,9 +73,16 @@ ktd-grid {
 
     .ktd-grid-selection {
         position: absolute;
-        border: 1px solid #2196f3;
+        border: 2px solid #2196f3;
+        border-radius: 4px;
         background-color: rgba(33, 150, 243, 0.1);
         pointer-events: none;
         z-index: 100;
+        transition: all 150ms ease;
+
+        &.ktd-grid-selection-collision {
+            border-color: #f44336;
+            background-color: rgba(244, 67, 54, 0.1);
+        }
     }
 }

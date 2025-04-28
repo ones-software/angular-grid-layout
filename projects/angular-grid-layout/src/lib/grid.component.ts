@@ -672,12 +672,12 @@ export class KtdGridComponent
         this.renderer.setStyle(
             this.selectionElement,
             'left',
-            `${initialGridX * colWidth + initialGridX * this.gap() - 2}px`,
+            `${initialGridX * colWidth + initialGridX * this.gap()}px`,
         );
         this.renderer.setStyle(
             this.selectionElement,
             'top',
-            `${initialGridY * Number(rowHeight) + initialGridY * this.gap() - 2}px`,
+            `${initialGridY * Number(rowHeight) + initialGridY * this.gap()}px`,
         );
         this.renderer.setStyle(this.selectionElement, 'width', `${colWidth}px`);
         this.renderer.setStyle(
@@ -721,6 +721,29 @@ export class KtdGridComponent
         // Update selection state
         this.selectionState = { x, y, w, h };
 
+        // Check for collisions
+        const layout = this.layout();
+        const hasCollision = layout?.some(
+            (item) =>
+                x < item.x + item.w &&
+                x + w > item.x &&
+                y < item.y + item.h &&
+                y + h > item.y,
+        );
+
+        // Update collision class
+        if (hasCollision) {
+            this.renderer.addClass(
+                this.selectionElement,
+                'ktd-grid-selection-collision',
+            );
+        } else {
+            this.renderer.removeClass(
+                this.selectionElement,
+                'ktd-grid-selection-collision',
+            );
+        }
+
         // Update visual selection
         const rowHeight =
             this.rowHeight() === 'fit'
@@ -734,8 +757,8 @@ export class KtdGridComponent
             (gridRect.width + this.gap()) / this.cols() - this.gap();
 
         // Calculate the total width and height including gaps
-        const totalWidth = w * colWidth + (w - 1) * this.gap() - 2;
-        const totalHeight = h * Number(rowHeight) + (h - 1) * this.gap() - 2;
+        const totalWidth = w * colWidth + (w - 1) * this.gap() - 4;
+        const totalHeight = h * Number(rowHeight) + (h - 1) * this.gap() - 4;
 
         // Position the selection element at the grid cell
         this.renderer.setStyle(
