@@ -384,6 +384,13 @@ export class KtdGridComponent
     }
 
     ngAfterContentInit() {
+        // Add touch-action: none to prevent browser scrolling
+        this.renderer.setStyle(
+            this.elementRef.nativeElement,
+            'touch-action',
+            'none',
+        );
+
         this.initSubscriptions();
     }
 
@@ -642,12 +649,20 @@ export class KtdGridComponent
         return target.closest('ktd-grid-item') !== null;
     }
 
-    private startSelection(event: MouseEvent) {
+    private startSelection(event: MouseEvent | TouchEvent) {
+        // Prevent default to avoid browser scrolling on touch devices
+        event.preventDefault();
+
+        const clientX =
+            'touches' in event ? event.touches[0].clientX : event.clientX;
+        const clientY =
+            'touches' in event ? event.touches[0].clientY : event.clientY;
+
         const gridRect = (
             this.elementRef.nativeElement as HTMLElement
         ).getBoundingClientRect();
-        const startX = event.clientX - gridRect.left;
-        const startY = event.clientY - gridRect.top;
+        const startX = clientX - gridRect.left;
+        const startY = clientY - gridRect.top;
 
         // Calculate initial grid position
         const initialGridX = this.screenToGridX(startX);
@@ -698,14 +713,22 @@ export class KtdGridComponent
         };
     }
 
-    private updateSelection(event: MouseEvent) {
+    private updateSelection(event: MouseEvent | TouchEvent) {
+        // Prevent default to avoid browser scrolling on touch devices
+        event.preventDefault();
+
         if (!this.selectionElement || !this.selectionState) return;
+
+        const clientX =
+            'touches' in event ? event.touches[0].clientX : event.clientX;
+        const clientY =
+            'touches' in event ? event.touches[0].clientY : event.clientY;
 
         const gridRect = (
             this.elementRef.nativeElement as HTMLElement
         ).getBoundingClientRect();
-        const currentX = event.clientX - gridRect.left;
-        const currentY = event.clientY - gridRect.top;
+        const currentX = clientX - gridRect.left;
+        const currentY = clientY - gridRect.top;
 
         const startX = this.selectionState.x;
         const startY = this.selectionState.y;
@@ -731,8 +754,13 @@ export class KtdGridComponent
         w = Math.min(w, maxCols - x);
         h = Math.min(h, maxRows - y);
 
-        // Update selection state
-        this.selectionState = { x, y, w, h };
+        // Update selection state - keep original start point
+        this.selectionState = {
+            x: startX, // Keep original start X
+            y: startY, // Keep original start Y
+            w: w,
+            h: h,
+        };
 
         // Check for collisions
         const layout = this.layout();
