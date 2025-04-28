@@ -19,8 +19,10 @@ import {
     ViewContainerRef,
     ViewEncapsulation,
 } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
     combineLatest,
+    fromEvent,
     merge,
     NEVER,
     Observable,
@@ -30,10 +32,12 @@ import {
 } from 'rxjs';
 import {
     exhaustMap,
+    filter,
     map,
     startWith,
     switchMap,
     takeUntil,
+    tap,
 } from 'rxjs/operators';
 import { KtdDictionary } from '../types';
 import { BooleanInput } from './coercion/boolean-property';
@@ -225,6 +229,29 @@ export class KtdGridComponent
 
     /** Emits when a grid item is being resized and its bounds have changed */
     readonly gridItemResize = output<KtdGridItemResizeEvent>();
+
+    /** Emits when a grid area is selected */
+    readonly gridAreaSelected = output<{
+        x: number;
+        y: number;
+        w: number;
+        h: number;
+    }>();
+
+    /** Whether grid selection is enabled */
+    readonly selectionEnabled = input<boolean>(false);
+    readonly selectionEnabled$ = toObservable(this.selectionEnabled);
+
+    /** Current selection state */
+    private selectionState: {
+        x: number;
+        y: number;
+        w: number;
+        h: number;
+    } | null = null;
+
+    /** Selection element */
+    private selectionElement: HTMLElement | null = null;
 
     /**
      * Parent element that contains the scroll. If an string is provided it would search that element by id on the dom.
@@ -566,7 +593,223 @@ export class KtdGridComponent
                         this.backgroundConfig()?.show === 'always',
                     );
                 }),
+
+            // Handle grid selection
+            this.selectionEnabled$
+                .pipe(
+                    switchMap((enabled) =>
+                        enabled
+                            ? fromEvent(
+                                  this.elementRef.nativeElement,
+                                  'pointerdown',
+                              ).pipe(
+                                  filter(
+                                      (event: MouseEvent) =>
+                                          !this.isOverGridItem(event),
+                                  ),
+                                  switchMap((startEvent: MouseEvent) => {
+                                      startEvent.preventDefault();
+                                      this.startSelection(startEvent);
+
+                                      return fromEvent(
+                                          document,
+                                          'pointermove',
+                                      ).pipe(
+                                          takeUntil(
+                                              fromEvent(
+                                                  document,
+                                                  'pointerup',
+                                              ).pipe(
+                                                  tap(() =>
+                                                      this.endSelection(),
+                                                  ),
+                                              ),
+                                          ),
+                                      );
+                                  }),
+                              )
+                            : NEVER,
+                    ),
+                )
+                .subscribe((moveEvent: MouseEvent) => {
+                    this.updateSelection(moveEvent);
+                }),
         ];
+    }
+
+    private isOverGridItem(event: MouseEvent): boolean {
+        const target = event.target as HTMLElement;
+        return target.closest('ktd-grid-item') !== null;
+    }
+
+    private startSelection(event: MouseEvent) {
+        const gridRect = (
+            this.elementRef.nativeElement as HTMLElement
+        ).getBoundingClientRect();
+        const startX = event.clientX - gridRect.left;
+        const startY = event.clientY - gridRect.top;
+
+        // Calculate initial grid position
+        const initialGridX = this.screenToGridX(startX);
+        const initialGridY = this.screenToGridY(startY);
+
+        // Create selection element
+        this.selectionElement = this.renderer.createElement('div');
+        this.renderer.addClass(this.selectionElement, 'ktd-grid-selection');
+
+        // Position the selection element at the grid cell
+        const rowHeight =
+            this.rowHeight() === 'fit'
+                ? ktdGetGridItemRowHeight(
+                      this.layout(),
+                      this.height() ?? gridRect.height,
+                      this.gap(),
+                  )
+                : this.rowHeight();
+        const colWidth =
+            (gridRect.width + this.gap()) / this.cols() - this.gap();
+
+        this.renderer.setStyle(
+            this.selectionElement,
+            'left',
+            `${initialGridX * colWidth + initialGridX * this.gap() - 2}px`,
+        );
+        this.renderer.setStyle(
+            this.selectionElement,
+            'top',
+            `${initialGridY * Number(rowHeight) + initialGridY * this.gap() - 2}px`,
+        );
+        this.renderer.setStyle(this.selectionElement, 'width', `${colWidth}px`);
+        this.renderer.setStyle(
+            this.selectionElement,
+            'height',
+            `${Number(rowHeight)}px`,
+        );
+        this.renderer.appendChild(
+            this.elementRef.nativeElement,
+            this.selectionElement,
+        );
+
+        this.selectionState = {
+            x: initialGridX,
+            y: initialGridY,
+            w: 1,
+            h: 1,
+        };
+    }
+
+    private updateSelection(event: MouseEvent) {
+        if (!this.selectionElement || !this.selectionState) return;
+
+        const gridRect = (
+            this.elementRef.nativeElement as HTMLElement
+        ).getBoundingClientRect();
+        const currentX = event.clientX - gridRect.left;
+        const currentY = event.clientY - gridRect.top;
+
+        const startX = this.selectionState.x;
+        const startY = this.selectionState.y;
+        const endX = this.screenToGridX(currentX);
+        const endY = this.screenToGridY(currentY);
+
+        // Calculate grid-aligned dimensions
+        const x = Math.min(startX, endX);
+        const y = Math.min(startY, endY);
+        const w = Math.abs(endX - startX) + 1;
+        const h = Math.abs(endY - startY) + 1;
+
+        // Update selection state
+        this.selectionState = { x, y, w, h };
+
+        // Update visual selection
+        const rowHeight =
+            this.rowHeight() === 'fit'
+                ? ktdGetGridItemRowHeight(
+                      this.layout(),
+                      this.height() ?? gridRect.height,
+                      this.gap(),
+                  )
+                : this.rowHeight();
+        const colWidth =
+            (gridRect.width + this.gap()) / this.cols() - this.gap();
+
+        // Calculate the total width and height including gaps
+        const totalWidth = w * colWidth + (w - 1) * this.gap() - 2;
+        const totalHeight = h * Number(rowHeight) + (h - 1) * this.gap() - 2;
+
+        // Position the selection element at the grid cell
+        this.renderer.setStyle(
+            this.selectionElement,
+            'left',
+            `${x * colWidth + x * this.gap()}px`,
+        );
+        this.renderer.setStyle(
+            this.selectionElement,
+            'top',
+            `${y * Number(rowHeight) + y * this.gap()}px`,
+        );
+        this.renderer.setStyle(
+            this.selectionElement,
+            'width',
+            `${totalWidth}px`,
+        );
+        this.renderer.setStyle(
+            this.selectionElement,
+            'height',
+            `${totalHeight}px`,
+        );
+    }
+
+    private endSelection() {
+        if (!this.selectionElement || !this.selectionState) return;
+
+        // Check for collisions with existing grid items
+        const layout = this.layout();
+        if (!layout) return;
+
+        const { x, y, w, h } = this.selectionState;
+        const hasCollision = layout.some(
+            (item) =>
+                x < item.x + item.w &&
+                x + w > item.x &&
+                y < item.y + item.h &&
+                y + h > item.y,
+        );
+
+        if (!hasCollision) {
+            this.gridAreaSelected.emit(this.selectionState);
+        }
+
+        // Clean up
+        if (this.selectionElement && this.selectionElement.parentNode) {
+            this.selectionElement.parentNode.removeChild(this.selectionElement);
+        }
+        this.selectionElement = null;
+        this.selectionState = null;
+    }
+
+    private screenToGridX(screenX: number): number {
+        const gridRect = (
+            this.elementRef.nativeElement as HTMLElement
+        ).getBoundingClientRect();
+        const colWidth =
+            (gridRect.width + this.gap()) / this.cols() - this.gap();
+        return Math.floor(screenX / (colWidth + this.gap()));
+    }
+
+    private screenToGridY(screenY: number): number {
+        const gridRect = (
+            this.elementRef.nativeElement as HTMLElement
+        ).getBoundingClientRect();
+        const rowHeight =
+            this.rowHeight() === 'fit'
+                ? ktdGetGridItemRowHeight(
+                      this.layout(),
+                      this.height() ?? gridRect.height,
+                      this.gap(),
+                  )
+                : this.rowHeight();
+        return Math.floor(screenY / (Number(rowHeight) + this.gap()));
     }
 
     /**
