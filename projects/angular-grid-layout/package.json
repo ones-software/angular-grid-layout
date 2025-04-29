@@ -13,7 +13,7 @@
         "registry": "https://pkgs.dev.azure.com/onessoftware/Bookings.ONE/_packaging/npm-packages/npm/registry/"
     },
     "license": "MIT",
-    "version": "2.2.5",
+    "version": "2.2.6",
     "keywords": [
         "angular",
         "grid",

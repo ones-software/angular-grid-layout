@@ -52,9 +52,9 @@ ktd-grid {
         cursor: crosshair;
     }
 
-    &.ktd-grid-selection-enabled ktd-grid-item {
-        cursor: default;
-    }
+    // &.ktd-grid-selection-enabled ktd-grid-item {
+    //     cursor: inherit;
+    // }
 
     ktd-grid-item {
         &.ktd-grid-item-dragging,
