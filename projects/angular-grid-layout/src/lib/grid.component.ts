@@ -253,6 +253,9 @@ export class KtdGridComponent
     /** Selection element */
     private selectionElement: HTMLElement | null = null;
 
+    /** Selection start time */
+    private selectionStartTime: number | null = null;
+
     /**
      * Parent element that contains the scroll. If an string is provided it would search that element by id on the dom.
      * If no data provided or null autoscroll is not performed.
@@ -604,8 +607,21 @@ export class KtdGridComponent
             // Handle grid selection
             this.selectionEnabled$
                 .pipe(
-                    switchMap((enabled) =>
-                        enabled
+                    switchMap((enabled) => {
+                        // Update selection enabled class
+                        if (enabled) {
+                            this.renderer.addClass(
+                                this.elementRef.nativeElement,
+                                'ktd-grid-selection-enabled',
+                            );
+                        } else {
+                            this.renderer.removeClass(
+                                this.elementRef.nativeElement,
+                                'ktd-grid-selection-enabled',
+                            );
+                        }
+
+                        return enabled
                             ? fromEvent(
                                   this.elementRef.nativeElement,
                                   'pointerdown',
@@ -627,16 +643,16 @@ export class KtdGridComponent
                                                   document,
                                                   'pointerup',
                                               ).pipe(
-                                                  tap(() =>
-                                                      this.endSelection(),
+                                                  tap((event) =>
+                                                      this.endSelection(event),
                                                   ),
                                               ),
                                           ),
                                       );
                                   }),
                               )
-                            : NEVER,
-                    ),
+                            : NEVER;
+                    }),
                 )
                 .subscribe((moveEvent: MouseEvent) => {
                     this.updateSelection(moveEvent);
@@ -653,6 +669,9 @@ export class KtdGridComponent
         // Prevent default to avoid browser scrolling on touch devices
         event.preventDefault();
 
+        // Record selection start time
+        this.selectionStartTime = Date.now();
+
         const clientX =
             'touches' in event ? event.touches[0].clientX : event.clientX;
         const clientY =
@@ -661,8 +680,8 @@ export class KtdGridComponent
         const gridRect = (
             this.elementRef.nativeElement as HTMLElement
         ).getBoundingClientRect();
-        const startX = clientX - gridRect.left;
-        const startY = clientY - gridRect.top;
+        const startX = Math.max(0, clientX - gridRect.left);
+        const startY = Math.max(0, clientY - gridRect.top);
 
         // Calculate initial grid position
         const initialGridX = this.screenToGridX(startX);
@@ -727,8 +746,8 @@ export class KtdGridComponent
         const gridRect = (
             this.elementRef.nativeElement as HTMLElement
         ).getBoundingClientRect();
-        const currentX = clientX - gridRect.left;
-        const currentY = clientY - gridRect.top;
+        const currentX = Math.max(0, clientX - gridRect.left);
+        const currentY = Math.max(0, clientY - gridRect.top);
 
         const startX = this.selectionState.x;
         const startY = this.selectionState.y;
@@ -824,15 +843,52 @@ export class KtdGridComponent
         );
     }
 
-    private endSelection() {
-        if (!this.selectionElement || !this.selectionState) return;
+    private endSelection(event: MouseEvent | TouchEvent) {
+        if (
+            !this.selectionElement ||
+            !this.selectionState ||
+            !this.selectionStartTime
+        )
+            return;
 
         // Check for collisions with existing grid items
         const layout = this.layout();
         if (!layout) return;
 
-        const { x, y, w, h } = this.selectionState;
-        const hasCollision = layout.some(
+        const clientX =
+            'touches' in event ? event.touches[0].clientX : event.clientX;
+        const clientY =
+            'touches' in event ? event.touches[0].clientY : event.clientY;
+
+        const gridRect = (
+            this.elementRef.nativeElement as HTMLElement
+        ).getBoundingClientRect();
+        const currentX = Math.max(0, clientX - gridRect.left);
+        const currentY = Math.max(0, clientY - gridRect.top);
+
+        const startX = this.selectionState.x;
+        const startY = this.selectionState.y;
+        const endX = this.screenToGridX(currentX);
+        const endY = this.screenToGridY(currentY);
+
+        // Calculate grid-aligned dimensions
+        let x = Math.min(startX, endX);
+        let y = Math.min(startY, endY);
+        let w = Math.abs(endX - startX) + 1;
+        let h = Math.abs(endY - startY) + 1;
+
+        // Constrain to grid boundaries
+        const maxCols = this.cols();
+        const maxRows =
+            this.rows() === 'auto'
+                ? Math.max(...this.layout().map((item) => item.y + item.h))
+                : Number(this.rows());
+
+        x = Math.max(0, Math.min(x, maxCols - 1));
+        y = Math.max(0, Math.min(y, maxRows - 1));
+        w = Math.min(w, maxCols - x);
+        h = Math.min(h, maxRows - y);
+        const hasCollision = layout?.some(
             (item) =>
                 x < item.x + item.w &&
                 x + w > item.x &&
@@ -840,7 +896,10 @@ export class KtdGridComponent
                 y + h > item.y,
         );
 
-        if (!hasCollision) {
+        const selectionDuration = Date.now() - this.selectionStartTime;
+
+        if (!hasCollision && (selectionDuration > 150 || w > 1 || h > 1)) {
+            console.log('selectionDuration', selectionDuration);
             this.gridAreaSelected.emit(this.selectionState);
         }
 
@@ -850,6 +909,7 @@ export class KtdGridComponent
         }
         this.selectionElement = null;
         this.selectionState = null;
+        this.selectionStartTime = null;
     }
 
     private screenToGridX(screenX: number): number {
