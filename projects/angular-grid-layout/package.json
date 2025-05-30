@@ -13,7 +13,7 @@
         "registry": "https://pkgs.dev.azure.com/onessoftware/_packaging/Offision/npm/registry/"
     },
     "license": "MIT",
-    "version": "2.2.6",
+    "version": "2.2.7",
     "keywords": [
         "angular",
         "grid",

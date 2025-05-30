@@ -28,6 +28,7 @@ import {
     Observable,
     Observer,
     of,
+    Subject,
     Subscription,
 } from 'rxjs';
 import {
@@ -339,6 +340,7 @@ export class KtdGridComponent
 
     private _gridItemsRenderData: KtdDictionary<KtdGridItemRenderData<number>>;
     private subscriptions: Subscription[];
+    private readonly _unsubscribe$ = new Subject<void>();
 
     constructor(
         private gridService: KtdGridService,
@@ -388,11 +390,23 @@ export class KtdGridComponent
 
     ngAfterContentInit() {
         // Add touch-action: none to prevent browser scrolling
-        this.renderer.setStyle(
-            this.elementRef.nativeElement,
-            'touch-action',
-            'none',
-        );
+
+        this.selectionEnabled$
+            .pipe(takeUntil(this._unsubscribe$))
+            .subscribe((enabled) => {
+                if (enabled) {
+                    this.renderer.setStyle(
+                        this.elementRef.nativeElement,
+                        'touch-action',
+                        'none',
+                    );
+                } else {
+                    this.renderer.removeStyle(
+                        this.elementRef.nativeElement,
+                        'touch-action',
+                    );
+                }
+            });
 
         this.initSubscriptions();
     }
@@ -408,6 +422,8 @@ export class KtdGridComponent
 
     ngOnDestroy() {
         this.subscriptions.forEach((sub) => sub.unsubscribe());
+        this._unsubscribe$.next();
+        this._unsubscribe$.complete();
     }
 
     compactLayout() {
